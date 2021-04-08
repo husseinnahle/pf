@@ -1,6 +1,5 @@
 /* ********************* *
  * TP1 INF3173 H2021
- * Code permanent: NAHH85090004
  * Nom: Nahlé
  * Prénom: Hussein
  * ********************* */
@@ -108,7 +107,6 @@ typedef struct{
 /* **********************************************************
  * av_time_t est utilisé pour stocker les différents valeurs:
  * temp utilisateur, temp réel et nombre de cycle cpu.
- * (Aide au calcul de la moyenne à la fin du programme)
  */
 
 typedef struct{
@@ -329,16 +327,6 @@ long perf_event_open(struct perf_event_attr *hw_event, pid_t pid,int cpu,
  * Cette fonction (et la fonction perf_event_open) est basée
  * sur l'exemple du man perf_event_open.
  * ---------------------------------------------------------
- *
- * Note: Pour éviter de faire deux appels système, et vue que
- * la valeur de cycle cpu n'est pas fix, j'ai choisi d'appeler
- * la fonction setTimeValues() à la place de _system() pour
- * récupérer en un seul exec tous les valeurs de value_t,
- * afin de rendre le programme plus performant.
- *
- * Pour faire un exec directement il suffit de remplacer
- * setTimesValue par _system, et ajouter setTimesValues
- * dans la fonction run.
  */
 
 void setCpuCycleCount(char** cmd, value_t* val){
