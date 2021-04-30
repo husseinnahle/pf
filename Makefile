@@ -1,7 +1,6 @@
 CFLAGS = -Wall -Werror=vla -pedantic -std=c11
 VAL = --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes
 
-# make: compiler pf.c et creer penv
 compile:
 	gcc $(CFLAGS) pf.c -o pf
 
