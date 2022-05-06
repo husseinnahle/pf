@@ -1,6 +1,5 @@
 #!/bin/sh
 # Faux pf qui utilise time et perf
-# /!\ Votre implémentation en C doit utiliser les appels système spécifiques indiqués dans le sujet
 
 case "$1" in
 	-u)

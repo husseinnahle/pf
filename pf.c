@@ -1,7 +1,6 @@
 /* ********************* *
  * TP1 INF3173 H2021
- * Nom: Nahlé
- * Prénom: Hussein
+ * Auteur: Hussein Nahle
  * ********************* */
 
 #include <stdio.h>
@@ -73,7 +72,8 @@
  * Voir plus dans setFlags()
  */
 
-typedef struct{
+typedef struct
+{
   int total_flags;
   int main_flags;
   int u_flag;
@@ -82,7 +82,7 @@ typedef struct{
   int n_flag;
   int n_value;
   int s_flag;
-}flag_t;
+} flag_t;
 
 
 /* **********************************************************
@@ -95,13 +95,14 @@ typedef struct{
  * returnValue      --> valeur de retour de exec
  */
 
-typedef struct{
+typedef struct
+{
   struct rusage usage;
   struct timespec start;
   struct timespec stop;
   long long cpu_cycle_count;
   int returnValue;
-}value_t;
+} value_t;
 
 
 /* **********************************************************
@@ -109,11 +110,12 @@ typedef struct{
  * temp utilisateur, temp réel et nombre de cycle cpu.
  */
 
-typedef struct{
+typedef struct
+{
   float user;
   float real;
   long long cpu;
-}av_time_t;
+} av_time_t;
 
 
 /* **********************************************************
@@ -128,9 +130,13 @@ typedef struct{
  *
  */
 
-size_t getLength(char** array){
+size_t size(char** array)
+{
   size_t i = 0;
-  while(array[i] != NULL) i++;
+  while(array[i] != NULL)
+  {
+    i++;
+  }
   return i;
 }
 
@@ -143,21 +149,25 @@ size_t getLength(char** array){
  *  char** array     --> tableau
  */
 
-void freeArray(char** array){
-  for(size_t i = 0; i < getLength(array); i++){
+void freeArray(char** array)
+{
+  for(size_t i = 0; i < size(array); i++)
+  {
     free(array[i]);
   }
   free(array);
 }
 
-void pexit(char* msg, char** cmd){
+void pexit(char* msg, char** cmd)
+{
   perror(msg);
   freeArray(cmd);
   exit(CMD_ERR);
 }
 
 
-void printUsage(){
+void printUsage()
+{
   printf(USG_MSG);
   exit(CMD_ERR);
 }
@@ -172,14 +182,25 @@ void printUsage(){
  */
 
 void printAvg(flag_t flags, av_time_t valTotal){
-  if(flags.n_value > 1){
-    if(!flags.main_flags){
+  if(flags.n_value > 1)
+  {
+    if(!flags.main_flags)
+    {
       printf("%.2f", (float)(valTotal.real / flags.n_value));
-    }else if(flags.u_flag){
+    }
+    
+    else if(flags.u_flag)
+    {
       printf("%.2f", (float)(valTotal.user / flags.n_value));
-    }else if(flags.c_flag){
+    }
+
+    else if(flags.c_flag)
+    {
       printf("%.lld", (long long)(valTotal.cpu / flags.n_value));
-    }else if(flags.a_flag){
+    }
+    
+    else if(flags.a_flag)
+    {
       printf("%.2f ", (float)(valTotal.real / flags.n_value));
       printf("%.2f ", (float)(valTotal.user / flags.n_value));
       printf("%.lld", (long long)(valTotal.cpu / flags.n_value));
@@ -202,9 +223,12 @@ void printAvg(flag_t flags, av_time_t valTotal){
  *  CMD_ERR 	 --> echec
  */
 
-int isDecimal(char* string){
-  for(int i = 0; i < strlen(string); i++){
-    if(!isdigit(string[i])) {
+int isDecimal(char* string)
+{
+  for(int i = 0; i < strlen(string); i++)
+  {
+    if(!isdigit(string[i]))
+    {
       printf("Erreur: -n %s\n", string);
       exit(CMD_ERR);
     }
@@ -225,7 +249,8 @@ int isDecimal(char* string){
  *  struct timespec stop  --> fin de l'enregistrement
  */
 
-void printRealTime(struct timespec start, struct timespec stop, av_time_t* valTotal){
+void printRealTime(struct timespec start, struct timespec stop, av_time_t* valTotal)
+{
   double stopTime = stop.tv_sec + ((double)stop.tv_nsec / (double)NANO);
   double startTime = start.tv_sec + ((double)start.tv_nsec / (double)NANO);
   valTotal->real += (float)(stopTime - startTime);
@@ -244,8 +269,9 @@ void printRealTime(struct timespec start, struct timespec stop, av_time_t* valTo
  *  struct rusage usage   --> temp utilisateur total d'execution
  */
 
-void printUserTime(struct rusage usage, av_time_t* valTotal){
-  float msec = usage.ru_utime.tv_usec / (float)MICRO;
+void printUserTime(struct rusage usage, av_time_t* valTotal)
+{
+  float msec = usage.ru_utime.tv_usec/(float)MICRO;
   float sec = usage.ru_utime.tv_sec;
   valTotal->user += sec + msec;
   printf("%.2f", sec + msec);
@@ -264,15 +290,19 @@ void printUserTime(struct rusage usage, av_time_t* valTotal){
 void _system(char** cmd, value_t* val){
   int wstatus;
   pid_t cPid = fork();
-  if(cPid < 0) {
+  if(cPid < 0)
+  {
     pexit(FRK_MSG, cmd);
-  }else if(cPid == 0){
+  }
+  else if(cPid == 0)
+  {
     execvp(cmd[0], cmd);
     pexit(cmd[0], cmd);
   }
   if(wait4(-1, &wstatus, 0, &(val->usage)) == -1)
+  {
   	pexit("Erreur wait4\n", cmd);
-
+  }
   val->returnValue = WEXITSTATUS(wstatus);
 }
 
@@ -287,24 +317,17 @@ void _system(char** cmd, value_t* val){
  *  value_t* val  --> pointeur value_t (voir struct value_t)
  */
 
-void setTimeValues(char** cmd, value_t* val){
-  int wstatus;
-  if(clock_gettime(CLOCK_MONOTONIC, &val->start) == -1) pexit(CLK_MSG, cmd);
+void setTimeValues(char** cmd, value_t* val)
+{
+  if(clock_gettime(CLOCK_MONOTONIC, &val->start) == -1)
+  {
+    pexit(CLK_MSG, cmd);
+  }
   _system(cmd, val);
-  if(clock_gettime(CLOCK_MONOTONIC, &val->stop) == -1) pexit(CLK_MSG, cmd);
-}
-
-
-/* **********************************************************
- * Appeler syscall() pour communiquer avec le kernel Linux.
- * Voir plus: man perf_event_open, man syscall.
- */
-
-long perf_event_open(struct perf_event_attr *hw_event, pid_t pid,int cpu,
-		int group_fd, unsigned long flags){
-  int ret;
-  ret = syscall(__NR_perf_event_open, hw_event, pid, cpu, group_fd, flags);
-  return ret;
+  if(clock_gettime(CLOCK_MONOTONIC, &val->stop) == -1)
+  {
+    pexit(CLK_MSG, cmd);
+  }
 }
 
 
@@ -341,9 +364,10 @@ void setCpuCycleCount(char** cmd, value_t* val){
   pe.exclude_kernel = 1;
   pe.inherit = 1;
   pe.exclude_hv = 1;
-
-  fd = perf_event_open(&pe, 0, -1, -1, PERF_FLAG_FD_CLOEXEC);
-  if (fd == -1){
+  // perf event open
+  fd = syscall(__NR_perf_event_open, &pe, 0, -1, -1, PERF_FLAG_FD_CLOEXEC);
+  if (fd == -1)
+  {
     fprintf(stderr, "Error opening leader %llx\n", pe.config);
     exit(EXIT_FAILURE);
   }
@@ -366,25 +390,33 @@ void setCpuCycleCount(char** cmd, value_t* val){
  *  flag_t flags     --> voir struct flag_t
  */
 
-void run(char** cmd, value_t* val, av_time_t* valTotal, flag_t flags){
+void run(char** cmd, value_t* val, av_time_t* valTotal, flag_t flags)
+{
   setCpuCycleCount(cmd, val);
-  //setTimeValues(cmd, val);
-  if(flags.u_flag){
+  if(flags.u_flag)
+  {
     printUserTime(val->usage, valTotal);
+  }
 
-  }else if(flags.c_flag){
+  else if(flags.c_flag)
+  {
     printf("%lld", val->cpu_cycle_count);
-
-  }else if(flags.a_flag){
+  }
+  
+  else if(flags.a_flag)
+  {
     printRealTime(val->start, val->stop, valTotal);
     printf(" ");
     printUserTime(val->usage, valTotal);
     printf(" ");
     printf("%lld", val->cpu_cycle_count);
-
-  }else{
+  }
+  
+  else
+  {
     printRealTime(val->start, val->stop, valTotal);
   }
+
   printf("\n");
   valTotal->cpu += val->cpu_cycle_count;
 }
@@ -403,7 +435,8 @@ void run(char** cmd, value_t* val, av_time_t* valTotal, flag_t flags){
  *  char** cmd	     --> tableau contenant la sous commande
  */
 
-char** shCMD(char** argv, size_t size, int totalFlags){
+char** shCMD(char** argv, size_t size, int totalFlags)
+{
   char** cmd = malloc((size+1) * sizeof(char*));
   cmd[0] = malloc(sizeof(char) * 8);
   strcpy(cmd[0], "/bin/sh");
@@ -427,9 +460,11 @@ char** shCMD(char** argv, size_t size, int totalFlags){
  *  char** cmd	     --> tableau contenant la sous commande
  */
 
-char** bashCMD(char** argv, size_t size, int totalFlags){
+char** bashCMD(char** argv, size_t size, int totalFlags)
+{
   char** cmd = malloc((size+1) * sizeof(char*));
-  for(size_t i = 0; i < size; i++){
+  for(size_t i = 0; i < size; i++)
+  {
     cmd[i] = malloc(sizeof(argv[i+totalFlags+1])+1);
     strcpy(cmd[i], argv[i+totalFlags+1]);
   }
@@ -450,14 +485,17 @@ char** bashCMD(char** argv, size_t size, int totalFlags){
  *  char** cmd	     --> tableau contenant la sous commande
  */
 
-char** getCMD(char** argv, int argc, flag_t flags){
-  size_t size;
+char** getCMD(char** argv, int argc, flag_t flags)
+{
   char ** cmd;
-  if(flags.s_flag){
-    size = argc - flags.total_flags - 1 + 2;
+  if(flags.s_flag)
+  {
+    size_t size = argc - flags.total_flags - 1 + 2;
     cmd = shCMD(argv, size, flags.total_flags);
-  }else{
-    size = argc - flags.total_flags - 1;
+  }
+  else
+  {
+    size_t size = argc - flags.total_flags - 1;
     cmd = bashCMD(argv, size, flags.total_flags);
   }
   cmd[size] = NULL;
@@ -476,40 +514,54 @@ char** getCMD(char** argv, int argc, flag_t flags){
  *  flag_t f --> voir struct flag_f
  */
 
-flag_t setFlags(int argc, char** argv){
-  if(argc == 1) printUsage();
+flag_t setFlags(int argc, char** argv)
+{
   flag_t f = {0, 0, 0, 0, 0, 0, 1, 0};
-  for(int i = 1; i < argc; i++){
-    if(!strcmp(argv[i], "-u")){
+  for(int i = 1; i < argc; i++)
+  {
+    if(!strcmp(argv[i], "-u"))
+    {
       if(f.main_flags || f.s_flag || f.n_flag) printUsage();
       f.u_flag++;
       f.main_flags++;
+    }
 
-    }else if(!strcmp(argv[i], "-c")){
+    else if(!strcmp(argv[i], "-c"))
+    {
       if(f.main_flags || f.s_flag || f.n_flag) printf;
       f.c_flag++;
       f.main_flags++;
+    }
 
-    }else if(!strcmp(argv[i], "-a")){
+    else if(!strcmp(argv[i], "-a"))
+    {
       if(f.main_flags || f.s_flag || f.n_flag) printUsage();
       f.a_flag++;
       f.main_flags++;
+    }
 
-    }else if(!strcmp(argv[i], "-n")){
+    else if(!strcmp(argv[i], "-n"))
+    {
       if(f.n_flag || f.s_flag || (isDecimal(argv[i+1]) && i+1 < argc)) printUsage();
       f.n_value = atoi(argv[i+1]);
       f.n_flag = 2;
       i++;
+    }
 
-    }else if(!strcmp(argv[i], "-s")){
-      if(f.s_flag) printUsage;
+    else if(!strcmp(argv[i], "-s"))
+    {
+      if(f.s_flag) printUsage();
       f.s_flag++;
-
-    }else if(!strcmp(argv[i], "./pf")){
+    }
+    
+    else if(!strcmp(argv[i], "./pf"))
+    {
       f.total_flags = f.main_flags + f.n_flag + f.s_flag;
       return f;
+    }
 
-    }else if(argv[i][0] == '-'){
+    else if(argv[i][0] == '-')
+    {
       printf("pf: illegal option %s", argv[i]);
       printUsage();
     }
@@ -518,15 +570,20 @@ flag_t setFlags(int argc, char** argv){
   return f;
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv)
+{
+  if(argc == 1)
+  {
+    printUsage();
+  }
   value_t val = {0, 0, 0, 0, 0};
   av_time_t valTotal = {0, 0, 0};
   flag_t flags = setFlags(argc, argv);
   char** cmd = getCMD(argv, argc, flags);
-
   for(int i = 0; i < flags.n_value; i++)
+  {
     run(cmd, &val, &valTotal, flags);
-
+  }
   printAvg(flags, valTotal);
   freeArray(cmd);
   return val.returnValue;
