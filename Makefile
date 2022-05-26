@@ -1,8 +1,9 @@
 CFLAGS = -Wall -Werror=vla -pedantic -std=c11
+TIME_H = -D_POSIX_C_SOURCE=199309L
 VAL = --tool=memcheck --leak-check=yes --show-reachable=yes --num-callers=20 --track-fds=yes
 
 compile:
-	gcc $(CFLAGS) pf.c -o pf
+	gcc $(CFLAGS) $(TIME_H) pf.c -o pf
 
 .PHONY: clean check check_local
 

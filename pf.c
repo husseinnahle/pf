@@ -3,6 +3,9 @@
  * Auteur: Hussein Nahle
  * ********************* */
 
+#if !defined _GNU_SOURCE
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -487,15 +490,16 @@ char** bashCMD(char** argv, size_t size, int totalFlags)
 
 char** getCMD(char** argv, int argc, flag_t flags)
 {
-  char ** cmd;
+  char** cmd;
+  size_t size = 0;
   if(flags.s_flag)
   {
-    size_t size = argc - flags.total_flags - 1 + 2;
+    size = argc - flags.total_flags - 1 + 2;
     cmd = shCMD(argv, size, flags.total_flags);
   }
   else
   {
-    size_t size = argc - flags.total_flags - 1;
+    size = argc - flags.total_flags - 1;
     cmd = bashCMD(argv, size, flags.total_flags);
   }
   cmd[size] = NULL;
@@ -528,7 +532,7 @@ flag_t setFlags(int argc, char** argv)
 
     else if(!strcmp(argv[i], "-c"))
     {
-      if(f.main_flags || f.s_flag || f.n_flag) printf;
+      if(f.main_flags || f.s_flag || f.n_flag) printUsage();
       f.c_flag++;
       f.main_flags++;
     }
@@ -576,8 +580,8 @@ int main(int argc, char** argv)
   {
     printUsage();
   }
-  value_t val = {0, 0, 0, 0, 0};
-  av_time_t valTotal = {0, 0, 0};
+  value_t val;
+  av_time_t valTotal;
   flag_t flags = setFlags(argc, argv);
   char** cmd = getCMD(argv, argc, flags);
   for(int i = 0; i < flags.n_value; i++)
@@ -588,3 +592,5 @@ int main(int argc, char** argv)
   freeArray(cmd);
   return val.returnValue;
 }
+
+#endif
